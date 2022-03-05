@@ -1,42 +1,46 @@
-import { createStore } from 'vuex'
+import { createStore, createLogger } from 'vuex'
+import auth from './modules/auth.module'
+import request from './modules/request.module'
+
+const plugins = []
+
+if(process.env.NODE_ENV === 'development') {
+  plugins.push(createLogger())
+}
 
 export default createStore({
+  plugins,
   state () {
     return {
-      tasks: JSON.parse(localStorage.getItem('my-tasks')) ?? []
-    }
-  },
-  mutations: {
-    createTask (state, task) {
-      state.tasks.push(task)
-      localStorage.setItem('my-tasks', JSON.stringify(state.tasks))
-    },
-    changeTask (state, task) {
-      const idx = state.tasks.findIndex((t) => t.id === task.id)
-      state.tasks[idx] = task
-      localStorage.setItem('my-tasks', JSON.stringify(state.tasks))
-    }
-  },
-  actions: {
-    createTask ({ commit }, task) {
-      if (task.date < new Date()) {
-        task.status = 'cancelled'
-      }
-      commit('createTask', task)
-    },
-    changeTask ({ commit }, task) {
-      commit('changeTask', task)
+      message: null,
+      sidebar: false
     }
   },
   getters: {
-    activeTasksCount (state) {
-      return state.tasks.filter((t) => t.status === 'active').length
+  },
+  mutations: {
+    setMessage(state, message){
+      state.message = message
     },
-    tasks (state) {
-      return state.tasks
+    clearMessage(state){
+      state.message = null
     },
-    taskById (_, getters) {
-      return id => getters.tasks.find(t => t.id === id)
+    openSidebar(state){
+      state.sidebar = open
+    },
+    closeSidebar(state){
+      state.sidebar = false
     }
+  },
+  actions: {
+    setMessage({commit}, message){
+      commit('setMessage', message)
+      setTimeout(() => {
+        commit('clearMessage')
+      }, 5000)
+    }
+  },
+  modules: {
+    auth, request
   }
 })

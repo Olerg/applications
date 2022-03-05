@@ -1,16 +1,19 @@
 <template>
-  <the-navbar></the-navbar>
-  <div class="container with-nav">
-    <router-view />
-  </div>
+  <component :is="layout + '-layout'" v-if="layout"></component>
 </template>
 <script>
-import TheNavbar from './components/TheNavbar.vue'
-
+import {computed} from 'vue'
+import {useRoute} from 'vue-router'
+import MainLayout from '@/layout/MainLayout'
+import AuthLayout from '@/layout/AuthLayout'
 export default {
-  components: { TheNavbar }
+  setup () {
+    const route = useRoute()
+    return {
+      layout: computed( () => route.meta.layout)
+    }
+  },
+  components: {MainLayout, AuthLayout}
+
 }
 </script>
-<style>
-
-</style>
